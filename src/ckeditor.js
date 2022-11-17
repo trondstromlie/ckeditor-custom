@@ -2,20 +2,14 @@
  * @license Copyright (c) 2014-2022, CKSource Holding sp. z o.o. All rights reserved.
  * For licensing, see LICENSE.md or https://ckeditor.com/legal/ckeditor-oss-license
  */
-import ClassicEditor from '@ckeditor/ckeditor5-editor-classic/src/classiceditor.js';
+import ClassicEditorBase from '@ckeditor/ckeditor5-editor-classic/src/classiceditor';
 import Autoformat from '@ckeditor/ckeditor5-autoformat/src/autoformat.js';
 import BlockQuote from '@ckeditor/ckeditor5-block-quote/src/blockquote.js';
 import Bold from '@ckeditor/ckeditor5-basic-styles/src/bold.js';
-import CKFinderUploadAdapter from '@ckeditor/ckeditor5-adapter-ckfinder/src/uploadadapter.js';
 import CloudServices from '@ckeditor/ckeditor5-cloud-services/src/cloudservices.js';
 import CodeBlock from '@ckeditor/ckeditor5-code-block/src/codeblock.js';
 import Essentials from '@ckeditor/ckeditor5-essentials/src/essentials.js';
 import Heading from '@ckeditor/ckeditor5-heading/src/heading.js';
-import Image from '@ckeditor/ckeditor5-image/src/image.js';
-import ImageCaption from '@ckeditor/ckeditor5-image/src/imagecaption.js';
-import ImageStyle from '@ckeditor/ckeditor5-image/src/imagestyle.js';
-import ImageToolbar from '@ckeditor/ckeditor5-image/src/imagetoolbar.js';
-import ImageUpload from '@ckeditor/ckeditor5-image/src/imageupload.js';
 import Indent from '@ckeditor/ckeditor5-indent/src/indent.js';
 import Italic from '@ckeditor/ckeditor5-basic-styles/src/italic.js';
 import Link from '@ckeditor/ckeditor5-link/src/link.js';
@@ -28,24 +22,32 @@ import SourceEditing from '@ckeditor/ckeditor5-source-editing/src/sourceediting.
 import Table from '@ckeditor/ckeditor5-table/src/table.js';
 import TableToolbar from '@ckeditor/ckeditor5-table/src/tabletoolbar.js';
 import TextTransformation from '@ckeditor/ckeditor5-typing/src/texttransformation.js';
+import GeneralHtmlSupport from '@ckeditor/ckeditor5-html-support/src/generalhtmlsupport';
+import {Plugin} from "@ckeditor/ckeditor5-core";
 
-class Editor extends ClassicEditor {}
+class allowHTML extends Plugin {
+	init() {
+		console.log( 'AddPdf was initialized. v2' );
+		const editor = this.editor;
+		editor.data.processor.keepHtml('div')
+		editor.data.processor.keepHtml('figure')
+		editor.data.processor.keepHtml('oembed')
+		editor.data.processor.keepHtml('iframe')
+	}
+}
+
+export default class ClassicEditor extends ClassicEditorBase {}
+
 
 // Plugins to include in the build.
-Editor.builtinPlugins = [
+ClassicEditor.builtinPlugins = [
 	Autoformat,
 	BlockQuote,
 	Bold,
-	CKFinderUploadAdapter,
 	CloudServices,
 	CodeBlock,
 	Essentials,
 	Heading,
-	Image,
-	ImageCaption,
-	ImageStyle,
-	ImageToolbar,
-	ImageUpload,
 	Indent,
 	Italic,
 	Link,
@@ -58,10 +60,12 @@ Editor.builtinPlugins = [
 	Table,
 	TableToolbar,
 	TextTransformation,
+	allowHTML,
+	GeneralHtmlSupport
 ];
 
 // Editor configuration.
-Editor.defaultConfig = {
+ClassicEditor.defaultConfig = {
 	toolbar: {
 		items: [
 			'heading',
@@ -76,16 +80,14 @@ Editor.defaultConfig = {
 			'indent',
 			'|',
 			'codeBlock',
-			'imageUpload',
 			'blockQuote',
 			'insertTable',
 			'mediaEmbed',
 			'|',
 			'undo',
-			'|',
 			'redo',
 			'|',
-			'sourceEditing',
+			'sourceEditing'
 		]
 	},
 	language: 'nb',
@@ -103,8 +105,46 @@ Editor.defaultConfig = {
 			'tableRow',
 			'mergeTableCells'
 		]
+	},
+	htmlSupport: {
+		allow: [
+			{
+				name: /.*/,
+				attributes: true,
+				classes: true,
+				styles: true
+			},
+			{
+				name: 'iframe',
+				attributes: true,
+				classes: true,
+				styles: true
+			}
+		]
+	},
+	mediaEmbed: {
+		previewsInData: true,
+		providers: [
+			{
+				// hint: this is just for previews. Get actual HTML codes by making API calls from your CMS
+				name: 'youtube',
+				className: 'test',
+
+				// Match all URLs or just the ones you need:
+				url: /.+/,
+
+				html: match => {
+					const url = match[ 0 ];
+					var iframeUrl = url.replace('watch?v=', 'embed/')
+
+					return (
+						// If you need, set maxwidth and other styles for 'iframely-embed' class - it's yours to customize
+						`<div style="position: relative; padding-bottom: 100%; height: 0; padding-bottom: 56.2493%;">
+            			<iframe src="${iframeUrl}" style="position: absolute; width: 100%; height: 100%; top: 0; left: 0;" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen="">test</iframe>
+        				</div>`
+					);
+				}
+			}
+		]
 	}
 };
-
-export default Editor;
-
