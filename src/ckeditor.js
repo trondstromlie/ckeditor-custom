@@ -27,7 +27,6 @@ import {Plugin} from "@ckeditor/ckeditor5-core";
 
 class allowHTML extends Plugin {
 	init() {
-		console.log( 'AddPdf was initialized. v2' );
 		const editor = this.editor;
 		editor.data.processor.keepHtml('div')
 		editor.data.processor.keepHtml('figure')
