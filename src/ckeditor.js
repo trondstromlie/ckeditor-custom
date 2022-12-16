@@ -27,7 +27,6 @@ import {Plugin} from "@ckeditor/ckeditor5-core";
 
 class allowHTML extends Plugin {
 	init() {
-		console.log('this is the local version 1')
 		const editor = this.editor;
 		editor.data.processor.keepHtml('figure')
 		editor.data.processor.keepHtml('iframe')
@@ -118,12 +117,9 @@ ClassicEditor.defaultConfig = {
 		previewsInData: true,
 		providers: [
 			{
-				// hint: this is just for previews. Get actual HTML codes by making API calls from your CMS
 				name: 'youtube',
-				className: 'test',
-
 				// Match all URLs or just the ones you need:
-				url: /.+/,
+				url: /.+(youtube).+/,
 
 				html: match => {
 					const url = match[ 0 ];
