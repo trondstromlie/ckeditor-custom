@@ -106,7 +106,7 @@ ClassicEditor.defaultConfig = {
 	htmlSupport: {
 		allow: [
 			{
-				name: /^(figure|iframe)$/,
+				name: /^(figure|iframe|a)$/,
 				attributes: true,
 				classes: true,
 				styles: true
