@@ -27,10 +27,9 @@ import {Plugin} from "@ckeditor/ckeditor5-core";
 
 class allowHTML extends Plugin {
 	init() {
+		console.log('this is the local version 1')
 		const editor = this.editor;
-		editor.data.processor.keepHtml('div')
 		editor.data.processor.keepHtml('figure')
-		editor.data.processor.keepHtml('oembed')
 		editor.data.processor.keepHtml('iframe')
 	}
 }
@@ -108,13 +107,7 @@ ClassicEditor.defaultConfig = {
 	htmlSupport: {
 		allow: [
 			{
-				name: /.*/,
-				attributes: true,
-				classes: true,
-				styles: true
-			},
-			{
-				name: 'iframe',
+				name: /^(figure|iframe)$/,
 				attributes: true,
 				classes: true,
 				styles: true
